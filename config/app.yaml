@@ -37,9 +37,9 @@ sqlite:
   file: "./config/sqlite.db"
   migrate: false
 mysql:
-  port: 3306 
-  host: "localhost"
-  name: "go-test"
+  port: 3306 # port opened on MySQL
+  host: "localhost" # MYSQL server address
+  name: "go-test" # database schema to connect to
   user: "root"
   password: "1234567"
   migrate: true
