@@ -1,51 +1,5 @@
 # go-web-init
 
-本项目基于
-[![workflows](https://github.com/qingwave/weave/workflows/weave/badge.svg)](https://github.com/qingwave/weave/actions?query=workflow%3Aweave)
-[![Go Report Card](https://goreportcard.com/badge/github.com/qingwave/weave)](https://goreportcard.com/report/github.com/qingwave/weave)
-[![codecov](https://codecov.io/gh/qingwave/weave/branch/master/graph/badge.svg?token=B93TcvKqA6)](https://codecov.io/gh/qingwave/weave)
-[![GitHub license](https://img.shields.io/github/license/qingwave/weave)](https://github.com/qingwave/weave/blob/master/LICENSE)
-
-<img src="web/src/assets/weave.png" width="50px">
-
----
-
-> English | [中文](README_zh.md)
-
-go-web-init is a Go + Vue3 application starter, simple but functional, supported by gin, gorm, redis, postgres/mysql/sqlite, vue, element-plus, websocket and much more.
-
-See [Demo](https://qingwave.github.io/weave/).
-
-<table>
-  <tr>
-     <td width="50%" align="center"><b>Login</b></td>
-     <td width="50%" align="center"><b>Home</b></td>
-  </tr>
-  <tr>
-     <td><img src="document/img/login.png"/></td>
-     <td><img src="document/img/hello.png"/></td>
-  </tr>
-  <tr>
-      <td width="50%" align="center"><b>Dashboard</b></td>
-      <td width="50%" align="center"><b>App</b></td>
-  </tr>
-  <tr>
-     <td><img src="document/img/dashboard.png"/></td>
-     <td><img src="document/img/app.png"/></td>
-  </tr>
-  <tr>
-      <td width="50%" align="center"><b>Web Shell</b></td>
-      <td width="50%" align="center"><b>Web Code Editor</b></td>
-  </tr>
-  <tr>
-     <td><img src="document/img/webshell.png"/></td>
-     <td><img src="document/img/log.png"/></td>
-  </tr>
-</table>
-
-## Demo
-
-Demo website: see https://qingwave.github.io/weave/
 
 Run ui with docker(no server and databases)
 ```bash
@@ -81,18 +35,12 @@ Frontend support features:
 - Web code editor, support by codemirror
 - MarkDown preview and editor
 
-TODOs
-- [x] Redis cache
-- [x] Request rate limit
-- [x] Authentication
-- [x] WebSocket
-- [x] Trace
-- [x] UI
-- [x] WebShell
-- [ ] Dark theme
-- [ ] Mobile UI 
 ## Get started
-Before starting, you should already install [golang](https://go.dev/), [docker](https://docs.docker.com/engine/install/) and [nodejs](https://nodejs.org/en/download/) in your develop env.
+Before starting, install the following:
+(1) Golang (https://go.dev/)
+(2) Docker (https://docs.docker.com/engine/install/)
+(3) NodeJS (https://nodejs.org/en/download/)
+
 ### Run server
 
 Env:
