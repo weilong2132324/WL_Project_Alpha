@@ -40,7 +40,7 @@ Before starting, install the following:
 (2) Docker (https://docs.docker.com/engine/install/)  
 (3) NodeJS (https://nodejs.org/en/download/)  
 
-### Getting the Project running
+### <ins>Getting the Project running<ins>
 
 #### <ins>FE<ins>
 If you have not downloaded the dependencies:  
