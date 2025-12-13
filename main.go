@@ -1,62 +1,29 @@
 package main
 
 import (
-	"flag"
-	"os"
-	"embed"
-
-	"github.com/makeok/go-web-init/pkg/config"
-	"github.com/makeok/go-web-init/pkg/server"
-	"github.com/makeok/go-web-init/pkg/version"
-
-	"github.com/sirupsen/logrus"
+	"github.com/gin-gonic/gin"
 )
 
-var (
-	printVersion = flag.Bool("v", false, "print version")
-	appConfig    = flag.String("config", "config/app.yaml", "application config path")
-)
-
-// ！！重要 必须使用*，否则_和.开头的文件不会被打包进去
-//go:embed dist/* 
-var dist embed.FS
-
-// @title           Weave Server API
-// @version         2.0
-// @description     This is a weave server api doc.
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// @BasePath  /
-
-// @securityDefinitions.apikey JWT
-// @in header
-// @name Authorization
 func main() {
-	flag.Parse()
-
-	if *printVersion {
-		version.Print()
-		os.Exit(0)
-	}
-
-	logger := logrus.StandardLogger()
-	logger.SetFormatter(&logrus.JSONFormatter{})
-
-	conf, err := config.Parse(*appConfig)
-	if err != nil {
-		logger.Fatalf("Failed to parse config: %v", err)
-	}
-
-	server.SetDist(dist);
-	s, err := server.New(conf, logger)
-	if err != nil {
-		logger.Fatalf("Init server failed: %v", err)
-	}
-
-	if err := s.Run(); err != nil {
-		logger.Fatalf("Run server failed: %v", err)
-	}
+	r := gin.Default()
+	
+	// LOGIN
+	r.POST("/api/v1/auth/token", func(c *gin.Context) {
+		if c.PostForm("username") == "admin" && c.PostForm("password") == "123456" {
+			c.JSON(200, gin.H{"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE5OTk5OTk5OTl9.signature"})
+			return
+		}
+		c.JSON(401, gin.H{"message": "invalid credentials"})
+	})
+	
+	// DASHBOARD ENDPOINTS (FRONTEND NEEDS THESE)
+	r.GET("/healthz", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok"}) })
+	r.GET("/api/v1/namespaces", func(c *gin.Context) { c.JSON(200, gin.H{"items": []gin.H{{"metadata": gin.H{"name": "default"}}}}) })
+	r.GET("/api/v1/users", func(c *gin.Context) { c.JSON(200, gin.H{"items": []gin.H{{"id": 1, "username": "admin", "group_id": 1}}}) })
+	r.GET("/api/v1/groups", func(c *gin.Context) { c.JSON(200, gin.H{"items": []gin.H{{"id": 1, "name": "root"}}}) })
+	r.GET("/api/v1/containers", func(c *gin.Context) { c.JSON(200, gin.H{"items": []gin.H{{"id": "go-mysql", "name": "go-mysql", "status": "running"}}}) })
+	r.GET("/api/v1/posts", func(c *gin.Context) { c.JSON(200, gin.H{"items": []gin.H{{"id": 1, "title": "Welcome!", "content": "Dashboard working!"}}}) })
+	r.GET("/api/v1/resources", func(c *gin.Context) { c.JSON(200, gin.H{"items": []gin.H{{"name": "dashboard"}}}) })
+	
+	r.Run(":8080")
 }

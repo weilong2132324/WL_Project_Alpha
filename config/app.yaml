@@ -42,7 +42,7 @@ mysql:
   name: "go-test"
   user: "root"
   password: "1234567"
-  migrate: false
+  migrate: true
 redis:
   enable: false
   port: 6379 
