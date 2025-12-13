@@ -1,6 +1,6 @@
 # WL-Project-Alpha   
 
-# Technology Stack
+## Technology Stack
 Frontend - Vue3
 Backend - Go
 Database - SQL
@@ -42,19 +42,19 @@ Before starting, install the following:\
 
 ### Getting the Project running
 
-# FE
+#### FE
 
 
 If all dependencies are already downloaded, run the following commands:
 - npm i
 - npm run dev
 
-# BE
+#### BE
 
 If all dependencies are already downloaded, run the following commands:
 - go run main.go
 - 
 
-# SQL
+#### SQL
 
 
