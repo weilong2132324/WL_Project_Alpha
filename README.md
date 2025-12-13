@@ -43,17 +43,19 @@ Before starting, install the following:
 ### Getting the Project running
 
 #### FE
+If you have not downloaded the dependencies:  
+- npm install  
+  --> Reads the package.json file. Downloads all listed dependencies into a folder named node_modules. Creates or updates the package-lock.json file to lock in specific versions.
 
-
-If all dependencies are already downloaded, run the following commands:
-- npm i
+If all dependencies are already downloaded, run the following commands:  
 - npm run dev
 
 #### BE
+If you have not downloaded the dependencies:  
+- go mod tidy
 
 If all dependencies are already downloaded, run the following commands:
 - go run main.go
-- 
 
 #### SQL
 
