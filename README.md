@@ -35,10 +35,10 @@ Frontend support features:
 - MarkDown preview and editor
 
 ## Get started
-Before starting, install the following:\
-(1) Golang (https://go.dev/)\
-(2) Docker (https://docs.docker.com/engine/install/)\
-(3) NodeJS (https://nodejs.org/en/download/)
+Before starting, install the following:
+(1) Golang (https://go.dev/)  
+(2) Docker (https://docs.docker.com/engine/install/)  
+(3) NodeJS (https://nodejs.org/en/download/)  
 
 ### Getting the Project running
 
