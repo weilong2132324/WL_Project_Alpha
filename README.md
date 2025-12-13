@@ -1,4 +1,4 @@
-# <ins>WL-Project-Alpha   <ins>
+# WL-Project-Alpha
 
 ## <ins>Technology Stack<ins>
 Frontend - Vue3
