@@ -1,1 +1,0 @@
-import{T as o}from"./Terminal-1cac332b.js";import{D as t,r as a,o as n,d as s}from"./index-c09751bd.js";import"./_commonjsHelpers-de833af9.js";const d={__name:"ContainerTerminal",setup(c){const r=t().params.id,e=a(`/api/v1/containers/${r}/exec`);return(u,p)=>(n(),s(o,{type:"docker",uri:e.value},null,8,["uri"]))}};export{d as default};

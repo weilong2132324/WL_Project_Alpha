@@ -41,10 +41,9 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// 必须在main中加载go embed
 var dist embed.FS
 
-func SetDist(distFs embed.FS) () {
+func SetDist(distFs embed.FS) {
 	dist = distFs
 }
 
@@ -53,7 +52,7 @@ func New(conf *config.Config, logger *logrus.Logger) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	var db *gorm.DB;
+	var db *gorm.DB
 	switch conf.Server.DbType {
 	case "mysql":
 		db, err = database.NewMysql(&conf.Mysql)
@@ -65,13 +64,12 @@ func New(conf *config.Config, logger *logrus.Logger) (*Server, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "Sqlite db init failed")
 		}
-	default :
+	default:
 		db, err = database.NewPostgres(&conf.Postgres)
 		if err != nil {
 			return nil, errors.Wrap(err, "Postgres db init failed")
 		}
 	}
-	
 
 	rdb, err := database.NewRedisClient(&conf.Redis)
 	if err != nil {
@@ -274,7 +272,6 @@ func (s *Server) Ping() *ServerStatus {
 	return status
 }
 
-
 /*
 假设vue/react项目输出文件夹名字为dist，拷贝到该go文件所在目录下
 注意"dist"前后不能有 /
@@ -299,20 +296,20 @@ func ServerStatic(prefix string, mode string, embedFs embed.FS) gin.HandlerFunc 
 			defer f.Close()
 			http.FileServer(fs2).ServeHTTP(ctx.Writer, ctx.Request)
 			ctx.Abort()
-		}else{
+		} else {
 			requestPath := ctx.Request.URL.Path
 			// dir, err := os.Getwd()
 			// if err != nil {
 			//     fmt.Println(err)
 			// }
 			// fmt.Println(dir)
-			if(strings.Contains(requestPath, "..")){
+			if strings.Contains(requestPath, "..") {
 				// 判断文件不存在，退出交给其他路由函数
 				ctx.Next()
 				return
 			}
 			absfilestr := prefix + requestPath
-			fileObj, err := os.Open(absfilestr);
+			fileObj, err := os.Open(absfilestr)
 			if err == nil {
 				ctx.File(absfilestr)
 			} else {

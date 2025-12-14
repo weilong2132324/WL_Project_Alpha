@@ -36,6 +36,7 @@ postgres:
 sqlite:
   file: "./config/sqlite.db"
   migrate: false
+
 mysql:
   port: 3306 # port opened on MySQL
   host: "localhost" # MYSQL server address
@@ -43,6 +44,7 @@ mysql:
   user: "root"
   password: "1234567"
   migrate: true
+
 redis:
   enable: false
   port: 6379 

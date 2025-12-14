@@ -11,8 +11,8 @@ import (
 type Config struct {
 	Server      ServerConfig           `yaml:"server"`
 	Postgres    DBConfig               `yaml:"postgres"`
-	Mysql    	DBConfig               `yaml:"mysql"`
-	Sqlite    	DBConfig          	   `yaml:"sqlite"`
+	Mysql       DBConfig               `yaml:"mysql"`
+	Sqlite      DBConfig               `yaml:"sqlite"`
 	Redis       RedisConfig            `yaml:"redis"`
 	OAuthConfig map[string]OAuthConfig `yaml:"oauth"`
 	Docker      DockerConfig           `yaml:"docker"`
@@ -26,7 +26,7 @@ type ServerConfig struct {
 	GracefulShutdownPeriod int                     `yaml:"gracefulShutdownPeriod"`
 	LimitConfigs           []ratelimit.LimitConfig `yaml:"rateLimits"`
 	JWTSecret              string                  `yaml:"jwtSecret"`
-	DbType   			   string                  `yaml:"dbType"`
+	DbType                 string                  `yaml:"dbType"`
 }
 
 type DBConfig struct {

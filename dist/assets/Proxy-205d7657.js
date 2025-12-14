@@ -1,0 +1,1 @@
+import{D as o,r as s,z as n,o as c,a as l}from"./index-ab9da3ee.js";const p=["src"],_={__name:"Proxy",setup(u){const t=o(),r=s("");return n(()=>{let e=t.params.id;if(e.length==0)return;let a="/api/v1/containers/"+e+"/proxy"+t.params.proxyPath;r.value=a}),(e,a)=>(c(),l("iframe",{src:r.value,width:"100%",height:"100%",allowfullscreen:""},null,8,p))}};export{_ as default};

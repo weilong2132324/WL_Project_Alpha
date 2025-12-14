@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS auth_infos (
     deleted_at timestamp
 );
 
-CREATE TABLE IF NOT EXISTS groups (
+CREATE TABLE IF NOT EXISTS `groups` (
     id integer PRIMARY KEY AUTO_INCREMENT,
     `name` varchar(100) NOT NULL UNIQUE,
     kind varchar(100),
@@ -40,18 +40,18 @@ CREATE TABLE IF NOT EXISTS groups (
     deleted_at timestamp
 );
 
-INSERT INTO groups (`name`, kind, `describe`, created_at) VALUES('root', 'system', 'weave system group', now());
-INSERT INTO groups (`name`, kind, `describe`, created_at) VALUES('system:authenticated', 'system', 'system group contains all authenticated user', now());
-INSERT INTO groups (`name`, kind, `describe`, created_at) VALUES('system:unauthenticated', 'system', 'system group contains all unauthenticated user', now());
+INSERT INTO `groups` (`name`, kind, `describe`, created_at) VALUES('root', 'system', 'weave system group', now());
+INSERT INTO `groups` (`name`, kind, `describe`, created_at) VALUES('system:authenticated', 'system', 'system group contains all authenticated user', now());
+INSERT INTO `groups` (`name`, kind, `describe`, created_at) VALUES('system:unauthenticated', 'system', 'system group contains all unauthenticated user', now());
 
 CREATE TABLE IF NOT EXISTS user_groups(
-    group_id BIGINT NOT NULL REFERENCES groups(id),
+    group_id BIGINT NOT NULL REFERENCES `groups`(id),
     user_id BIGINT NOT NULL REFERENCES users(id),
     PRIMARY KEY(group_id, user_id)
 );
 
 INSERT INTO user_groups (group_id, user_id)
-    SELECT  g.id, u.id FROM users AS u, groups AS g 
+    SELECT  g.id, u.id FROM users AS u, `groups` AS g 
     WHERE (u.name='admin' AND g.name='root');
 
 CREATE TABLE IF NOT EXISTS resources (
@@ -80,14 +80,14 @@ CREATE TABLE IF NOT EXISTS user_roles(
 );
 
 CREATE TABLE IF NOT EXISTS group_roles(
-    group_id BIGINT NOT NULL REFERENCES groups(id),
+    group_id BIGINT NOT NULL REFERENCES `groups`(id),
     role_id BIGINT NOT NULL REFERENCES roles(id),
     PRIMARY KEY(group_id, role_id)
 );
 
-INSERT INTO group_roles (group_id, role_id) VALUES((SELECT id FROM groups WHERE name = 'root'), (SELECT id FROM roles WHERE name = 'cluster-admin'));
-INSERT INTO group_roles (group_id, role_id) VALUES((SELECT id FROM groups WHERE name = 'system:authenticated'), (SELECT id FROM roles WHERE name = 'authenticated'));
-INSERT INTO group_roles (group_id, role_id) VALUES((SELECT id FROM groups WHERE name = 'system:unauthenticated'), (SELECT id FROM roles WHERE name = 'unauthenticated'));
+INSERT INTO group_roles (group_id, role_id) VALUES((SELECT id FROM `groups` WHERE name = 'root'), (SELECT id FROM roles WHERE name = 'cluster-admin'));
+INSERT INTO group_roles (group_id, role_id) VALUES((SELECT id FROM `groups` WHERE name = 'system:authenticated'), (SELECT id FROM roles WHERE name = 'authenticated'));
+INSERT INTO group_roles (group_id, role_id) VALUES((SELECT id FROM `groups` WHERE name = 'system:unauthenticated'), (SELECT id FROM roles WHERE name = 'unauthenticated'));
 
 CREATE TABLE IF NOT EXISTS posts (
     id integer PRIMARY KEY AUTO_INCREMENT,
