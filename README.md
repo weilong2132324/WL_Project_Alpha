@@ -58,5 +58,7 @@ If all dependencies are already downloaded, run the following commands:
 - go run main.go
 
 #### <ins>SQL<ins>
+ To get the database container up and running, run this command:
 
+ docker run --name mysql-new -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=go-test -v $(pwd)/scripts/mysql.sql:/docker-entrypoint-initdb.d/init.sql mysql:8.0
 
