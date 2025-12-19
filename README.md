@@ -42,6 +42,7 @@ Before starting, install the following:
 
 ### <ins>Getting the Project running<ins>
 
+### Running the containers individually
 #### <ins>FE<ins>
 If you have not downloaded the dependencies:  
 - npm install  
@@ -62,3 +63,5 @@ If all dependencies are already downloaded, run the following commands:
 
  docker run --name mysql-new -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=go-test -v $(pwd)/scripts/mysql.sql:/docker-entrypoint-initdb.d/init.sql mysql:8.0
 
+### Running the containers together
+docker compose up --build
