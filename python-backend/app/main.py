@@ -119,12 +119,22 @@ app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
-    config = get_config()
+    
+    try:
+        config = get_config()
+        host = config.server.address
+        port = config.server.port
+        reload = config.server.env == "debug"
+    except Exception as e:
+        print(f"Warning: Could not load config, using defaults: {e}")
+        host = "127.0.0.1"
+        port = 8000
+        reload = True
     
     uvicorn.run(
         "app.main:app",
-        host=config.server.address,
-        port=config.server.port,
-        reload=config.server.env == "debug",
+        host=host,
+        port=port,
+        reload=reload,
         log_level="info"
     )
