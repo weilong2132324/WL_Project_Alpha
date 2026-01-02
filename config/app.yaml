@@ -46,7 +46,7 @@ mysql:
   migrate: true
 
 redis:
-  enable: false
+  enable: true
   port: 6379 
   host: "localhost"
   password: "123456"

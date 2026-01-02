@@ -1,0 +1,61 @@
+server:
+  env: "debug"
+  address: "127.0.0.1"
+  port: 8000
+  graceful_shutdown_period: 30
+  rate_limits:
+    - limit_type: "server"
+      burst: 500
+      qps: 100
+      cache_size: 1
+    - limit_type: "ip"
+      burst: 50
+      qps: 10
+      cache_size: 2048
+  jwt_secret: "weaveserver"
+  db_type: "mysql"
+
+docker:
+  enable: true
+  host: "unix:///var/run/docker.sock"
+
+kubernetes:
+  enable: true
+  watch_resources:
+    - "Deployment.v1.apps"
+    - "Pod.v1."
+    - "Namespace.v1."
+
+postgres:
+  port: 5432
+  host: "localhost"
+  name: "go-test-weave"
+  user: "go-test"
+  password: "go-test"
+  migrate: false
+
+sqlite:
+  file: "./config/sqlite.db"
+  migrate: false
+
+mysql:
+  port: 3306
+  host: "localhost"
+  name: "go-test"
+  user: "root"
+  password: "1234567"
+  migrate: true
+
+redis:
+  enable: true
+  port: 6379
+  host: "localhost"
+  password: "123456"
+
+oauth:
+  github:
+    client_id: "85db232fde2c9320ece7"
+    client_secret: ""
+  wechat:
+    client_id: ""
+    client_secret: ""

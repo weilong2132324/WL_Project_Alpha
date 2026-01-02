@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: weave_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234567"
+      MYSQL_DATABASE: "go-test"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: weave_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  python-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: weave_backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:1234567@mysql:3306/go-test
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./config:/app/config
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  mysql_data:
+  redis_data:
