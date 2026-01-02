@@ -8,7 +8,7 @@ services:
       MYSQL_ROOT_PASSWORD: "1234567"
       MYSQL_DATABASE: "go-test"
     ports:
-      - "3306:3306"
+      - "3307:3306"  # Use 3307 on host since 3306 is in use locally
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:

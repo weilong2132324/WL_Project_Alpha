@@ -1,7 +1,8 @@
 """Authentication API endpoints"""
 
+import json
 import logging
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.auth_service import AuthService
@@ -11,16 +12,16 @@ from app.models import User
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/auth", tags=["authentication"])
+router = APIRouter(prefix="/api/v1/auth", tags=["authentication"])
 
 
-@router.post("/register", response_model=RegisterResponse)
+@router.post("/user", response_model=RegisterResponse)
 async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     """Register a new user"""
     auth_service = AuthService(db)
     
     success, user, message = auth_service.register(
-        username=request.username,
+        username=request.name,
         email=request.email,
         password=request.password
     )
@@ -34,22 +35,44 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/login", response_model=LoginResponse)
-async def login(request: LoginRequest, db: Session = Depends(get_db)):
+@router.post("/token")
+async def login(request: LoginRequest, response: Response, db: Session = Depends(get_db)):
     """Login user and get access token"""
     auth_service = AuthService(db)
     
     success, user, token, message = auth_service.login(
-        username=request.username,
+        username=request.name,
         password=request.password
     )
     
     if not success:
         raise UnauthorizedException(message)
     
+    user_response = UserResponse.model_validate(user)
+    
+    # Set cookie if requested
+    if request.setCookie:
+        import urllib.parse
+        user_cookie = json.dumps({
+            "id": user_response.id,
+            "name": user_response.name,
+            "email": user_response.email,
+            "avatar": user_response.avatar,
+        })
+        # URL encode the JSON for cookie safety
+        encoded_cookie = urllib.parse.quote(user_cookie)
+        response.set_cookie(
+            key="loginUser",
+            value=encoded_cookie,
+            max_age=86400,  # 1 day
+            path="/",
+            httponly=False,  # Allow JS access
+            samesite="lax"
+        )
+    
     return LoginResponse(
         access_token=token,
-        user=UserResponse.model_validate(user)
+        user=user_response
     )
 
 

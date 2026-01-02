@@ -28,8 +28,8 @@ class UserUpdate(BaseModel):
 class UserResponse(UserBase):
     """User response schema"""
     id: int
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
@@ -38,8 +38,9 @@ class UserResponse(UserBase):
 # Authentication schemas
 class LoginRequest(BaseModel):
     """Login request schema"""
-    username: str
+    name: str
     password: str
+    setCookie: Optional[bool] = False
 
 
 class LoginResponse(BaseModel):
@@ -51,7 +52,7 @@ class LoginResponse(BaseModel):
 
 class RegisterRequest(BaseModel):
     """Registration request schema"""
-    username: str = Field(..., min_length=1, max_length=100)
+    name: str = Field(..., min_length=1, max_length=100)
     email: Optional[str] = None
     password: str = Field(..., min_length=6)
 

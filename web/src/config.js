@@ -15,8 +15,8 @@ const authInfo = {
 };
 
 const githubInfo = {
-    project: 'https://github.com/makeok/go-web-init',
-    doc: 'https://github.com/makeok/go-web-init/blob/master/README.md#weave',
+    project: 'https://github.com/weilong2132324/WL_Project_Alpha',
+    doc: 'https://github.com/weilong2132324/WL_Project_Alpha/blob/master/README.md',
 }
 
 export { authInfo, githubInfo };

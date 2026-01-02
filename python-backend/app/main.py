@@ -39,6 +39,9 @@ async def lifespan(app: FastAPI):
     db_manager.create_tables()
     logger.info("Database initialized")
     
+    # Create default admin user if not exists
+    create_default_admin()
+    
     # Connect Redis
     redis_client = get_redis_client()
     if redis_client.is_enabled():
@@ -53,6 +56,37 @@ async def lifespan(app: FastAPI):
     redis_client.close()
     db_manager.close()
     logger.info("Application shutdown complete")
+
+
+def create_default_admin():
+    """Create default admin user if not exists"""
+    from app.database import get_db_manager
+    from app.models import User
+    from app.utils.auth import hash_password
+    
+    db_manager = get_db_manager()
+    session_gen = db_manager.get_session()
+    db = next(session_gen)
+    try:
+        # Check if admin exists
+        admin = db.query(User).filter(User.name == "admin").first()
+        if not admin:
+            admin = User(
+                name="admin",
+                email="admin@example.com",
+                password=hash_password("123456"),
+                avatar=None
+            )
+            db.add(admin)
+            db.commit()
+            logger.info("Default admin user created (admin/123456)")
+        else:
+            logger.info("Admin user already exists")
+    except Exception as e:
+        logger.error(f"Failed to create admin user: {e}")
+        db.rollback()
+    finally:
+        db.close()
 
 
 def create_app() -> FastAPI:

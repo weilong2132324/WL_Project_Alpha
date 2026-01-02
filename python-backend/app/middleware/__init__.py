@@ -52,18 +52,37 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
     """Verify JWT token in requests"""
     
     EXCLUDED_PATHS = {
+        "/",
         "/healthz",
+        "/health",
         "/docs",
         "/openapi.json",
         "/redoc",
+        "/favicon.ico",
         "/api/auth/login",
         "/api/auth/register",
         "/api/auth/oauth",
+        "/api/v1/auth/token",
+        "/api/v1/auth/user",
+        "/api/v1/auth/login",
+        "/api/v1/auth/register",
+        "/api/v1/auth/oauth",
     }
     
+    EXCLUDED_PREFIXES = (
+        "/docs",
+        "/static",
+    )
+    
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        path = request.url.path
+        
         # Skip authentication for excluded paths
-        if request.url.path in self.EXCLUDED_PATHS:
+        if path in self.EXCLUDED_PATHS:
+            return await call_next(request)
+        
+        # Skip authentication for excluded prefixes
+        if path.startswith(self.EXCLUDED_PREFIXES):
             return await call_next(request)
         
         # Extract token from header
@@ -71,12 +90,21 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         token = extract_token_from_header(auth_header)
         
         if not token:
-            raise UnauthorizedException("Missing or invalid authorization header")
+            # Return JSON response instead of raising exception
+            return Response(
+                content='{"success": false, "message": "Missing or invalid authorization header"}',
+                status_code=401,
+                media_type="application/json"
+            )
         
         # Verify token
         token_data = verify_token(token)
         if not token_data:
-            raise UnauthorizedException("Invalid or expired token")
+            return Response(
+                content='{"success": false, "message": "Invalid or expired token"}',
+                status_code=401,
+                media_type="application/json"
+            )
         
         # Store token data in request state
         request.state.user_id = token_data.user_id
