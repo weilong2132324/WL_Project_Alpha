@@ -1,4 +1,5 @@
 #! /bin/bash
+set -euo pipefail
 
 export DB_CONTAINER_NAME="sql_dev_container"
 export DB_NAME="go-test"
