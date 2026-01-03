@@ -65,3 +65,27 @@ If all dependencies are already downloaded, run the following commands:
 
 ### Running the containers together
 docker compose up --build
+
+
+## Redis Configuration
+Done! Here's what I've configured for your Redis Cluster:
+
+Redis Cluster Setup
+Architecture (6 nodes):
+Node	Port	Role
+redis-node-1	6379	Master 1
+redis-node-2	6380	Master 2
+redis-node-3	6381	Master 3
+redis-node-4	6382	Replica (of Master)
+redis-node-5	6383	Replica (of Master)
+redis-node-6	6384	Replica (of Master)
+Key Features:
+16384 hash slots distributed across 3 masters
+Automatic failover - if a master dies, its replica gets promoted
+Data sharding - keys are distributed based on hash slot
+Cluster bus ports (16379-16384) for node-to-node communication
+How It Works:
+redis-cluster-init container runs once to create the cluster
+Uses --cluster-replicas 1 = each master gets 1 replica
+Backend connects using REDIS_CLUSTER_NODES environment variable
+Python client uses redis.cluster.RedisCluster for cluster-aware operations

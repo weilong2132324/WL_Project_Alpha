@@ -25,12 +25,15 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      redis:
+      redis-node-1:
+        condition: service_started
+      redis-node-2:
+        condition: service_started
+      redis-node-3:
         condition: service_started
     environment:
       - DATABASE_URL=mysql+pymysql://root:password@mysql:3306/go-test
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_CLUSTER_NODES=redis-node-1:6379,redis-node-2:6379,redis-node-3:6379
     ports:
       - "8000:8000"
     volumes:
@@ -48,41 +51,203 @@ services:
       - "3000:80"
     restart: unless-stopped
 
-  redis:
+  # Redis Cluster - 6 nodes (3 masters + 3 replicas)
+  redis-node-1:
     image: redis:7-alpine
-    container_name: redis-master
+    container_name: redis-node-1
     ports:
       - "6379:6379"
-    command: redis-server --appendonly yes
+      - "16379:16379"  # Cluster bus port
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes
     volumes:
-      - redis_master_data:/data
+      - redis_node1_data:/data
     restart: unless-stopped
 
-  redis-replica-1:
+  redis-node-2:
     image: redis:7-alpine
-    container_name: redis-replica-1
+    container_name: redis-node-2
     ports:
       - "6380:6379"
-    command: redis-server --appendonly yes --replicaof redis-master 6379
-    depends_on:
-      - redis
+      - "16380:16379"
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes
     volumes:
-      - redis_replica1_data:/data
+      - redis_node2_data:/data
     restart: unless-stopped
 
-  redis-replica-2:
+  redis-node-3:
     image: redis:7-alpine
-    container_name: redis-replica-2
+    container_name: redis-node-3
     ports:
       - "6381:6379"
-    command: redis-server --appendonly yes --replicaof redis-master 6379
-    depends_on:
-      - redis
+      - "16381:16379"
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes
     volumes:
-      - redis_replica2_data:/data
+      - redis_node3_data:/data
+    restart: unless-stopped
+
+  redis-node-4:
+    image: redis:7-alpine
+    container_name: redis-node-4
+    ports:
+      - "6382:6379"
+      - "16382:16379"
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes
+    volumes:
+      - redis_node4_data:/data
+    restart: unless-stopped
+
+  redis-node-5:
+    image: redis:7-alpine
+    container_name: redis-node-5
+    ports:
+      - "6383:6379"
+      - "16383:16379"
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes
+    volumes:
+      - redis_node5_data:/data
+    restart: unless-stopped
+
+  redis-node-6:
+    image: redis:7-alpine
+    container_name: redis-node-6
+    ports:
+      - "6384:6379"
+      - "16384:16379"
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes
+    volumes:
+      - redis_node6_data:/data
+    restart: unless-stopped
+
+  # Cluster initializer - runs once to create the cluster
+  redis-cluster-init:
+    image: redis:7-alpine
+    container_name: redis-cluster-init
+    depends_on:
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+      - redis-node-6
+    command: >
+      sh -c "sleep 5 && 
+      redis-cli --cluster create 
+      redis-node-1:6379 
+      redis-node-2:6379 
+      redis-node-3:6379 
+      redis-node-4:6379 
+      redis-node-5:6379 
+      redis-node-6:6379 
+      --cluster-replicas 1 --cluster-yes"
+    restart: "no"
+
+  # ============ MONITORING STACK ============
+
+  # Redis Exporters - one per Redis node
+  redis-exporter-1:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter-1
+    environment:
+      - REDIS_ADDR=redis://redis-node-1:6379
+    ports:
+      - "9121:9121"
+    depends_on:
+      - redis-node-1
+    restart: unless-stopped
+
+  redis-exporter-2:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter-2
+    environment:
+      - REDIS_ADDR=redis://redis-node-2:6379
+    ports:
+      - "9122:9121"
+    depends_on:
+      - redis-node-2
+    restart: unless-stopped
+
+  redis-exporter-3:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter-3
+    environment:
+      - REDIS_ADDR=redis://redis-node-3:6379
+    ports:
+      - "9123:9121"
+    depends_on:
+      - redis-node-3
+    restart: unless-stopped
+
+  redis-exporter-4:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter-4
+    environment:
+      - REDIS_ADDR=redis://redis-node-4:6379
+    ports:
+      - "9124:9121"
+    depends_on:
+      - redis-node-4
+    restart: unless-stopped
+
+  redis-exporter-5:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter-5
+    environment:
+      - REDIS_ADDR=redis://redis-node-5:6379
+    ports:
+      - "9125:9121"
+    depends_on:
+      - redis-node-5
+    restart: unless-stopped
+
+  redis-exporter-6:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter-6
+    environment:
+      - REDIS_ADDR=redis://redis-node-6:6379
+    ports:
+      - "9126:9121"
+    depends_on:
+      - redis-node-6
+    restart: unless-stopped
+
+  # Prometheus - metrics storage & querying
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+
+  # Grafana - visualization & dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
     restart: unless-stopped
 
 volumes:
-  redis_master_data:
-  redis_replica1_data:
-  redis_replica2_data:
+  redis_node1_data:
+  redis_node2_data:
+  redis_node3_data:
+  redis_node4_data:
+  redis_node5_data:
+  redis_node6_data:
+  prometheus_data:
+  grafana_data:

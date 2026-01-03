@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s          # How often to scrape targets
+  evaluation_interval: 15s       # How often to evaluate rules
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Redis Cluster nodes - using redis_exporter
+  - job_name: 'redis-cluster'
+    static_configs:
+      - targets:
+        - 'redis-exporter-1:9121'
+        - 'redis-exporter-2:9121'
+        - 'redis-exporter-3:9121'
+        - 'redis-exporter-4:9121'
+        - 'redis-exporter-5:9121'
+        - 'redis-exporter-6:9121'

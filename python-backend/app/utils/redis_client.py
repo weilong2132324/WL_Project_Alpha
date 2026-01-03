@@ -35,8 +35,13 @@ class RedisClient:
                 password=redis_config.password if redis_config.password else None,
                 db=0,
                 decode_responses=False,
+
                 socket_connect_timeout=5,
+                socket_timeout=5,
                 socket_keepalive=True,
+                retry_on_timeout=True,
+                health_check_interval=30
+
             )
             
             # Test connection
