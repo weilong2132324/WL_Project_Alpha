@@ -1,7 +1,5 @@
 module github.com/makeok/go-web-init
 
-go 1.19
-
 require (
 	github.com/bombsimon/logrusr/v2 v2.0.1
 	github.com/docker/docker v23.0.6+incompatible
@@ -10,6 +8,8 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-logr/logr v1.2.4
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-redsync/redsync/v4 v4.0.0
+	 github.com/go-redsync/redsync/v4/redis/goredis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/golang-lru/v2 v2.0.2
