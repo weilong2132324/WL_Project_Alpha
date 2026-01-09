@@ -1,0 +1,95 @@
+---
+- name: Provision and configure Docker container
+  hosts: localhost
+  vars:
+    container_name: go-web-init-demo
+    image_name: nginx:latest
+    host_port: 8080
+    container_port: 80
+    copy_src: ../web/index.html
+    copy_dest: /usr/share/nginx/html/index.html
+  tasks:
+    - name: Ensure Docker is installed
+      ansible.builtin.package:
+        name: docker
+        state: present
+      become: true
+      when: ansible_os_family != 'Windows'
+
+    - name: Start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+      become: true
+      when: ansible_os_family != 'Windows'
+
+    - name: Run docker-compose up
+      ansible.builtin.command:
+        cmd: docker-compose up -d
+        chdir: "{{ playbook_dir | dirname }}"
+      environment:
+        COMPOSE_PROJECT_NAME: go_web_init
+      register: compose_result
+      changed_when: "'Creating' in compose_result.stdout or 'Recreating' in compose_result.stdout or 'Starting' in compose_result.stdout"
+      failed_when: compose_result.rc != 0
+      ignore_errors: false
+
+    - name: Pull Nginx image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        source: pull
+
+    - name: Run Nginx container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        state: started
+        ports:
+          - "{{ host_port }}:{{ container_port }}"
+        restart_policy: always
+
+    - name: Copy custom index.html to container
+      community.docker.docker_cp:
+        src: "{{ copy_src }}"
+        dest: "{{ container_name }}:{{ copy_dest }}"
+
+    - name: Reload Nginx in container
+      community.docker.docker_container_exec:
+        container: "{{ container_name }}"
+        command: nginx -s reload
+
+    # --- Redis version update automation ---
+    - name: Pull latest Redis image
+      community.docker.docker_image:
+        name: redis:latest
+        source: pull
+
+    - name: Pull latest Python image
+      community.docker.docker_image:
+        name: python:latest
+        source: pull
+
+    - name: Pull latest Grafana image
+      community.docker.docker_image:
+        name: grafana/grafana:latest
+        source: pull
+
+    - name: Pull latest Prometheus image
+      community.docker.docker_image:
+        name: prom/prometheus:latest
+        source: pull
+
+    - name: Stop and remove existing Redis container (if running)
+      community.docker.docker_container:
+        name: redis
+        state: absent
+      ignore_errors: true
+
+    - name: Start Redis container with latest image
+      community.docker.docker_container:
+        name: redis
+        image: redis:latest
+        state: started
+        ports:
+          - "6379:6379"
+        restart_policy: always
